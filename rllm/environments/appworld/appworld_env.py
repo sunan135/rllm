@@ -2,7 +2,6 @@ import logging
 import threading
 
 from appworld import AppWorld as _AppWorld
-
 from rllm.environments.base.base_env import BaseEnv
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(filename)s:%(lineno)d] %(message)s")
