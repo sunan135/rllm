@@ -3,6 +3,8 @@ import threading
 
 from rllm.environments.base.base_env import BaseEnv
 
+from appworld import AppWorld as _AppWorld
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(filename)s:%(lineno)d] %(message)s")
 
 # AppWorld is not thread-safe, so we need to use a lock to synchronize access to the AppWorld instance
@@ -62,12 +64,11 @@ class AppWorldEnv(BaseEnv):
         # Initialize AppWorld based on unique task_id
         with _appworld_lock:
             try:
-                from appworld import AppWorld
 
                 # get the task id
                 task_id = self.task.get("task_id") if self.task else None
                 if task_id:
-                    self.world = AppWorld(task_id=task_id)
+                    self.world = _AppWorld(task_id=task_id)
                     self.world_id = task_id
 
                     # Get instruction from AppWorld if not provided in task
