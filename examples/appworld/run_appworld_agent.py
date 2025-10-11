@@ -24,18 +24,55 @@ async def main(num_tasks=10, max_turns=40, split="dev"):
     os.environ["TOKENIZERS_PARALLELISM"] = "true"
 
     # Check API key
-    if not os.getenv("OPENAI_API_KEY"):
-        print("No OPENAI_API_KEY")
-        return
+    # if not os.getenv("OPENAI_API_KEY"):
+    #     print("No OPENAI_API_KEY")
+    #     return
+
+    # n_parallel_agents = 4
+
+    # model_name = "gpt-4o-mini"
+    # # Use a tokenizer with chat template (only for formatting messages and calculating token counts in the engine)
+    # # Qwen2-0.5B is small and fast to download
+    # tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2-0.5B-Instruct")
+
+    # sampling_params = {"temperature": 0.6, "top_p": 0.95, "model": model_name}
+    # agent_args = {}
+    # env_args = {"max_turns": max_turns}
+
+    # # Create engine
+    # engine = AgentExecutionEngine(
+    #     agent_class=AppWorldReactAgent,
+    #     agent_args=agent_args,
+    #     env_class=AppWorldEnv,
+    #     env_args=env_args,
+    #     engine_name="openai",
+    #     tokenizer=tokenizer,
+    #     sampling_params=sampling_params,
+    #     rollout_engine_args={"base_url": "https://api.openai.com/v1", "api_key": os.getenv("OPENAI_API_KEY")},
+    #     n_parallel_agents=n_parallel_agents,
+    #     max_response_length=16384,
+    #     max_prompt_length=4096,
+    #     max_steps=max_turns,
+    # )
+
+    if not os.getenv("SAMBANOVA_API_KEY"):
+        print("No SAMBANOVA_API_KEY")
+        exit(1)
 
     n_parallel_agents = 4
 
-    model_name = "gpt-4o-mini"
-    # Use a tokenizer with chat template (only for formatting messages and calculating token counts in the engine)
-    # Qwen2-0.5B is small and fast to download
+    # Use SAMBANOVA_API_KEY's latest Llama 3.3 70B Turbo instruct model
+    model_name = "Meta-Llama-3.3-70B-Instruct"
+
+    # Tokenizer can remain lightweight just for formatting / token counting
     tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2-0.5B-Instruct")
 
-    sampling_params = {"temperature": 0.6, "top_p": 0.95, "model": model_name}
+    sampling_params = {
+        "temperature": 0.6,
+        "top_p": 0.95,
+        "model": model_name,
+    }
+
     agent_args = {}
     env_args = {"max_turns": max_turns}
 
@@ -48,10 +85,13 @@ async def main(num_tasks=10, max_turns=40, split="dev"):
         engine_name="openai",
         tokenizer=tokenizer,
         sampling_params=sampling_params,
-        rollout_engine_args={"base_url": "https://api.openai.com/v1", "api_key": os.getenv("OPENAI_API_KEY")},
+        rollout_engine_args={
+            "base_url": "https://api.sambanova.ai/v1",
+            "api_key": os.getenv("SAMBANOVA_API_KEY"),
+        },
         n_parallel_agents=n_parallel_agents,
-        max_response_length=16384,
-        max_prompt_length=4096,
+        max_response_length=40000,
+        max_prompt_length=80000,
         max_steps=max_turns,
     )
 
@@ -127,9 +167,9 @@ def load_appworld_official_tasks(split="dev", num_tasks=10):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run AppWorld Agent with rLLM", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument("-n", "--num-tasks", type=int, default=10, help="Number of tasks to run (use -1 for all tasks)")
+    parser.add_argument("-n", "--num-tasks", type=int, default=1, help="Number of tasks to run (use -1 for all tasks)")
     parser.add_argument("-t", "--max-turns", type=int, default=40, help="Maximum number of turns per task")
-    parser.add_argument("-s", "--split", type=str, default="dev", choices=["train", "dev", "test_normal", "test_challenge"], help="Which split to use")
+    parser.add_argument("-s", "--split", type=str, default="test_normal", choices=["train", "dev", "test_normal", "test_challenge"], help="Which split to use")
 
     args = parser.parse_args()
 
