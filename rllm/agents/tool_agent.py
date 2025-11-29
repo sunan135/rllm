@@ -6,8 +6,7 @@ from typing import Any
 
 from rllm.agents.agent import Action, BaseAgent, Step, Trajectory
 from rllm.agents.system_prompts import TOOL_SYSTEM_PROMPT
-from rllm.parser import get_tool_parser
-from rllm.parser.tool_parser.tool_parser_base import ToolParser
+from rllm.parser import ToolParser, get_tool_parser
 from rllm.tools.mcp_tool import MCPTool
 from rllm.tools.multi_tool import MultiTool
 from rllm.tools.tool_base import Tool
@@ -94,6 +93,11 @@ class ToolAgent(BaseAgent):
         obs_messages = self._format_observation_as_messages(observation)
         self.messages.extend(obs_messages)
         self.current_observation = observation
+
+        if self._trajectory.steps:
+            self._trajectory.steps[-1].reward = reward
+            self._trajectory.steps[-1].done = done
+            self._trajectory.steps[-1].info = info
 
     def update_from_model(self, response: str, **kwargs) -> Action:
         """

@@ -18,16 +18,22 @@ The environments module provides various training and evaluation environments:
 
 - **Base Environment**: Core environment interface
 
+### 🧩 Workflow
+The workflow module supports complex multi-step agent interactions:
+
+- **Base Workflow**: Core workflow interface and base functionality
 
 ### ⚙️ Engine
 The engine module contains the core execution infrastructure:
 
 - **Agent Execution Engine**: Handles trajectory rollout and agent execution
+- **Agent Workflow Engine**: Handles episode rollout for complex workflows
 
 ### 🎯 Trainer
 The trainer module provides RL training capabilities:
 
 - **Agent Trainer**: Main training interface for RL algorithms
+- **Ray Runtime Environment**: Configuration for Ray runtime environment
 
 ### 🛠️ Tools
 The tools module provides a comprehensive framework for creating and managing tools:
